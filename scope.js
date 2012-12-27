@@ -7,15 +7,28 @@
  */
 Ext.define('MyPanel', {
 	extend : 'Ext.Panel',
-	xtype: 'mypanel',
+	xtype : 'mypanel',
 
-	sayHello : function() { console.log('Hello world'); },
+	sayHello : function() {
+		console.log('Hello world');
+	},
 
-	tbar : [
-		{
-			text : 'Click to say hello',
-			handler : this.sayHello,
-			scope : this
+	initComponent : function() {
+		this.callParent(arguments);
+		var tbar = this.getDockedItems()[0],
+			button = tbar.items.items[0];
+
+		button.on('click', this.sayHello, this);
+	},
+
+	tbar : [{
+		text : 'Click to say hello'
+	}],
+
+	listeners : {
+		render: function(me) {
+			var tbar = this.getDockedItems()[0],
+				targetEl = tbar.targetEl;
 		}
-	]
+	}
 });

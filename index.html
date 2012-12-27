@@ -14,19 +14,31 @@
     </style>
 
     <script type="text/javascript" src="http://cdn.sencha.com/ext-4.1.1-gpl/ext-all-debug.js"></script>
+    <script type="text/javascript">
+    </script>
 
     <script type="text/javascript" src="scope.js"></script>
-    <script type="text/javascript" src="gridRefresh.js"></script>
+    <!--<script type="text/javascript" src="gridRefresh.js"></script>-->
 </head>
 <body>
 
-<!-- 3. & 8. Quiz question -->
-<ul class='somelist'>
-    <li>one</li>
-    <li>two</li>
-    <li>three</li>
-</ul>
+<div>
+    <!-- 3. & 8. Quiz question -->
+    <ul class='somelist'>
+        <li>one</li>
+        <li>two</li>
+        <li>three</li>
+    </ul>
+</div>
+
 <div id="quiz4"></div>
 <div id="quiz5"></div>
 </body>
+<script type="text/javascript">
+    Ext.onReady(function() {
+        var a = Ext.widget('mypanel', {
+            renderTo: Ext.getBody()
+        });
+    })
+</script>
 </html>
