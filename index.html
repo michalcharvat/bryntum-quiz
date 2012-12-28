@@ -36,8 +36,20 @@
 </body>
 <script type="text/javascript">
     Ext.onReady(function() {
+        var body = Ext.getBody();
         var a = Ext.widget('mypanel', {
-            renderTo: Ext.getBody()
+            renderTo: body
+        });
+
+
+        // quiz 8
+        var ul = body.query('ul.somelist')[0];
+
+        Ext.fly(ul).on('click', function(e, target) {
+            console.log(arguments);
+            alert(target.innerText + ' pressed');
+        }, null, {
+            delegate: 'li'
         });
     })
 </script>
