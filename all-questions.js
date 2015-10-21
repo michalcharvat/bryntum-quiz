@@ -163,7 +163,19 @@ var isTree = this.store instanceof Ext.data.TreeStore;
 
 // Answer and corrected line:
 
+/*
+I guess on some circumstances this.store can be a string storeId, or ever null.
+In its turn null instanceof Ext.data.TreeStore, does not produce exception.
+Then need to foresee all three cases: null, string or Ext.data.Store
+*/
 
+var store = this.store;
+
+if (Ext.isString(store)) {
+    store = Ext.getStore(this.store);
+}
+
+var isTreeProof = store instanceof Ext.data.TreeStore;
 
 
 
