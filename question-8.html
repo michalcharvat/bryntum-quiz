@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bryntum Quiz ** Q 8</title>
+
+    <script type="text/javascript" src="http://cdn.sencha.com/ext-4.1.1-gpl/ext-all-debug.js"></script>
+
+</head>
+<body>
+
+<div>
+    <!-- 3. & 8. Quiz question -->
+    <ul class='somelist'>
+        <li>one</li>
+        <li>two</li>
+        <li>three</li>
+    </ul>
+</div>
+
+</body>
+<script type="text/javascript">
+    Ext.onReady(function() {
+        var body = Ext.getBody();
+
+        // quiz 8
+        var ul = body.query('ul.somelist')[0];
+
+        Ext.fly(ul).on('click', function(e, target) {
+            console.log(arguments);
+            alert(target.innerText + ' pressed');
+        }, null, {
+            delegate: 'li'
+        });
+    })
+</script>
+</html>

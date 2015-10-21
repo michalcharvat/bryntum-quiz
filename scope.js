@@ -6,29 +6,27 @@
  * To change this template use File | Settings | File Templates.
  */
 Ext.define('MyPanel', {
-	extend : 'Ext.Panel',
-	xtype : 'mypanel',
+    extend: 'Ext.Panel',
+    xtype: 'mypanel',
 
-	sayHello : function() {
-		console.log('Hello world');
-	},
+    sayHello: function() {
+        console.log('Hello world');
+        alert('Hello Mats, I fixed your bug :)');
+    },
 
-	initComponent : function() {
-		this.callParent(arguments);
-		var tbar = this.getDockedItems()[0],
-			button = tbar.items.items[0];
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
 
-		button.on('click', this.sayHello, this);
-	},
+        var button = me.down('button[action=hello]');
 
-	tbar : [{
-		text : 'Click to say hello'
-	}],
+        if (button) {
+            button.on('click', me.sayHello, me);
+        }
+    },
 
-	listeners : {
-		render: function(me) {
-			var tbar = this.getDockedItems()[0],
-				targetEl = tbar.targetEl;
-		}
-	}
+    tbar: [{
+        action: 'hello',
+        text: 'Click to say hello'
+    }]
 });
