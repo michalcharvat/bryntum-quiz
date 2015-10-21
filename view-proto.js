@@ -54,14 +54,14 @@ Ext.define('MyGrid', {
     viewConfig: {
         setCellColor : function(color) {
             var form = this.ownerCt;
-            form.colors.cell = color;
+            form.cellColors.cell = color;
 
             this.refresh();
         },
 
         getCellColor : function() {
             var form = this.ownerCt;
-            return form.colors.cell;
+            return form.cellColors.cell;
         }
     }
 });

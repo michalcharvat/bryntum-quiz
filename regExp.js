@@ -22,4 +22,4 @@ var inp = [
         out.push(version);
         console.log(item, '->', version);
     });
-}) (inp);
+} (inp));

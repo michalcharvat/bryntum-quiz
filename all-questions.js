@@ -46,7 +46,15 @@ var strings = [
 
 // Answer:
 
-
+(function quiz2 (ar) {
+    ar.forEach(function(item) {
+        var re = new RegExp('ext(js)?-(.*)/', 'g');
+        var result = re.exec(item);
+        var version = result ? result[2] : 'N/A';
+        out.push(version);
+        console.log(item, '->', version);
+    });
+} (inp));
 
 
 
@@ -65,6 +73,15 @@ var strings = [
 
 // Answer:
 
+// Need to add some style definition
+// run http://localhost/~user1/bquiz/question-3.html
+/*
+<style type="text/css">
+    ul.somelist li:hover {
+    background-color: lightgray;
+}
+</style>
+*/
 
 
 
@@ -90,6 +107,34 @@ Ext.define('MyPanel', {
 
 // Corrected class definition:
 
+//  By class declaration *this* inside the function points to the Window object, rather than to the Class instance as it might expected.
+//  To work around need to add listener at the other place, eg. at initComponent callback.
+
+Ext.define('MyPanel', {
+    extend: 'Ext.Panel',
+    xtype: 'mypanel',
+
+    sayHello: function() {
+        console.log('Hello world');
+        alert('Hello Mats, I fixed your bug :)');
+    },
+
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+
+        var button = me.down('button[action=hello]');
+
+        if (button) {
+            button.on('click', me.sayHello, me);
+        }
+    },
+
+    tbar: [{
+        action: 'hello',
+        text: 'Click to say hello'
+    }]
+});
 
 
 /**
@@ -133,7 +178,45 @@ Ext.define('MyGrid', {
 
 // Corrected class definition:
 
+// viewConfig property is placed in the Class prototype, then it shared between all MyGrid instancies
+// changing any of its property will affect on all grid.
+// Solution: move cellColors property to the class definition.
 
+Ext.define('MyGridNoBug', {
+    extend : 'Ext.grid.Panel',
+    store: 'myStore',
+    alias: 'widget.mygrid',
+
+    columns : [
+        {
+            text      : 'Company',
+            dataIndex : 'company',
+            renderer  : function(value, meta, record, row, column, store, view) {
+                meta.style = "background-color:" + view.getCellColor();
+
+                return value;
+            }
+        }
+    ],
+
+    cellColors : {
+        cell : '#00ff00'
+    },
+
+    viewConfig: {
+        setCellColor : function(color) {
+            var form = this.ownerCt;
+            form.cellColors.cell = color;
+
+            this.refresh();
+        },
+
+        getCellColor : function() {
+            var form = this.ownerCt;
+            return form.cellColors.cell;
+        }
+    }
+});
 
 
 /**
@@ -163,15 +246,14 @@ var isTree = this.store instanceof Ext.data.TreeStore;
 
 // Answer and corrected line:
 
-/*
-I guess on some circumstances this.store can be a string storeId, or ever null.
-In its turn null instanceof Ext.data.TreeStore, does not produce exception.
-Then need to foresee all three cases: null, string or Ext.data.Store
-*/
+//    I guess on some circumstances this.store can be a string storeId, or ever null.
+//    In its turn null instanceof Ext.data.TreeStore, does not produce exception.
+//    Then need to foresee all three cases: null, string or Ext.data.Store
 
 var store = this.store;
 
-if (Ext.isString(store)) {
+// Ext.getStore(null) produces exception!
+if (store != null) {
     store = Ext.getStore(this.store);
 }
 
@@ -193,7 +275,21 @@ var isTreeProof = store instanceof Ext.data.TreeStore;
  *
  */
 
+
 // Answer:
+//Have to use delegate option.
+Ext.onReady(function() {
+    var body = Ext.getBody();
+    // quiz 8
+    var ul = body.query('ul.somelist')[0];
+
+    Ext.fly(ul).on('click', function(e, target) {
+        console.log(arguments);
+        alert(target.innerText + ' pressed');
+    }, null, {
+        delegate: 'li'
+    });
+});
 
 
 /**
@@ -235,12 +331,22 @@ myGrid.store.loadData([
 // Answer & corrected plugin definition:
 
 
+
 /**
  * 10. Designing complex and re-usable ExtJS UI widgets (potentially consisting from other re-usable
  *     widgets), what will be your design principles / best practices / etc?
  */
 
 // Answer
+
+/*
+* 1. Use sencha packages
+* 2. Very well documentation
+* 3. Very careful rendering policy
+* 4. Do not use undocumented features
+* 5. Thoroughly units and integration testing
+*
+*/
 
 /**
  * 11. You are given an input array of intervals on a number axis. For each
@@ -289,3 +395,89 @@ var output3 = [
 
 // Answer
 
+var suite = [input1, input2, input3];
+
+var suiteCheck = [output1, output2, output3];
+
+
+function gantt(inp) {
+    var out = [];
+    var boundsObj = {};
+
+
+//    figure out all possible boundaries;
+    extEach(inp, function(room) {
+        extEach(['start', 'end'], function(border) {
+            var boundary = room[border];
+
+            boundsObj[boundary] = 0;
+        })
+    });
+
+    // create boundaries array ordered
+    var boundsArr = Object.keys(boundsObj);
+    for (var index = 0; index < boundsArr.length; index++) {
+        var strBoundary = boundsArr[index];
+        boundsArr.splice(index, 1, Number(strBoundary))
+    }
+    boundsArr.sort();
+
+    console.log('All possible boundaries: %s' , JSON.stringify(boundsArr));
+
+    // evaluate values on boundaries
+    extEach(inp, function(room) {
+        var start = room.start,
+            end = room.end,
+            value = room.value,
+            boundaryStartIndex = boundsArr.indexOf(start),
+            boundaryEndIndex = boundsArr.indexOf(end);
+
+        for (var index = boundaryStartIndex; index < boundaryEndIndex; index++) {
+            var boundary = boundsArr[index];
+
+            boundsObj[boundary] += value;
+        }
+    });
+
+    console.log('Boundaries values: %s' , JSON.stringify(boundsObj));
+
+    // convert to continues single-dimensioned rooms
+    var startBoundaryIndex = boundsArr[0],
+        startBoundary = boundsObj[startBoundaryIndex],
+        startRoomValue = startBoundary,
+        boundaries = boundsArr.length;
+
+    for (var boundaryIndex = 1; boundaryIndex < boundaries; boundaryIndex++) {
+        var endBoundaryIndex = boundsArr[boundaryIndex],
+            endRoomValue = boundsObj[endBoundaryIndex];
+
+        if (endRoomValue !== startRoomValue) {
+            if (startRoomValue > 0) {
+                out.push({
+                    start: startBoundaryIndex,
+                    end: endBoundaryIndex,
+                    value: startRoomValue
+                });
+
+            }
+
+            startBoundaryIndex = endBoundaryIndex;
+            startRoomValue = endRoomValue;
+        }
+    }
+
+    return out;
+}
+
+
+// TestSuite driver
+(function() {
+    for (var testIndex = 0; testIndex < suite.length; testIndex++) {
+        var testCase = suite[testIndex];
+        var got = gantt(testCase);
+        var expected = suiteCheck[testIndex];
+
+        // expected should be equals got
+        // try http://localhost/~user1/bquiz/question-11.html to view debugging information
+    }
+}());
