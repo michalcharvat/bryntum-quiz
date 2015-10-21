@@ -141,6 +141,16 @@ Ext.define('MyGrid', {
  */
 
 // Answer:
+/**
+ Main concerns, that Ext.getCmp() encourages to use static ids of the components. It could in turns causes bad programming
+ practice, particularly:
+
+     Limited to one instance of Component per ID
+     Bloats code
+     Messy/harder to read
+     Slower due to execution stack
+     Can generate invalid HTML (duplicate ids)
+ */
 
 
 /**
