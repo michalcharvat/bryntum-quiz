@@ -16,43 +16,74 @@ var input1 = [
 ];
 
 var output1 = [
-    { start :1, end : 3, value :1 }
+    {start: 1, end: 3, value: 1}
 ];
 
 var input2 = [
-    { start :1, end :3, value :1 },
-    { start :2, end :4, value :1 }
+    {start: 1, end: 3, value: 1},
+    {start: 2, end: 4, value: 1}
 ];
 
 var output2 = [
-    { start :1, end :2, value :1 },
-    { start :2, end :3, value :2 },
-    { start :3, end :4, value :1 }
+    {start: 1, end: 2, value: 1},
+    {start: 2, end: 3, value: 2},
+    {start: 3, end: 4, value: 1}
 ];
 
 var input3 = [
-    { start :1, end :4.5, value :1 },
-    { start :2.5, end :4, value :1 },
-    { start :2, end :5, value :2 },
-    { start :4, end :5, value :1 }
+    {start: 1, end: 3, value: 1},
+    {start: 2, end: 4, value: 1},
+    {start: 2, end: 5, value: 2},
+    {start: 4, end: 5, value: 1}
 ];
 
 var output3 = [
-    { start :1, end :2, value :1 },
-    { start :2, end :3, value :4 },
-    { start :3, end :5, value :3 }
+    {start: 1, end: 2, value: 1},
+    {start: 2, end: 3, value: 4},
+    {start: 3, end: 5, value: 3}
+];
+
+var input4 = [
+    {start: 1, end: 2, value: 1},
+    {start: 3, end: 4, value: 1}
+];
+
+var input5 = [];
+
+var input6 = null;
+
+var input7 = [
+    {start: 1, end: 2, value: 1},
+    {start: 4, end: 5, value: 1}
 ];
 
 
-var suite = [input1, input2, input3];
+var input8 = [
+    {start: 1, end: 2, value: 1},
+    {start: 3, end: 5, value: 1}
+];
 
-var suiteCheck = [output1, output2, output3];
+var input9 = [
+    {start: 1, end: 2, value: 1},
+    {start: 4, end: 6, value: 2},
+    {start: 5, end: 7, value: 1}
+];
+
+var  output9 = [
+    {"start":1,"end":2,"value":1},
+    {"start":4,"end":5,"value":2},
+    {"start":5,"end":6,"value":3},
+    {"start":6,"end":7,"value":1}
+];
+
+var suite = [input1, input2, input3, input4, input5, input6, input7, input8, input9];
+
+var suiteCheck = [output1, output2, output3, input4, input5, [], input7, input8, output9];
 
 
 function gantt(inp) {
     var out = [];
-    var boundsArr = [],
-        boundsObj = {};
+    var boundsObj = {};
 
 
 //    figure out all possible boundaries;
@@ -60,12 +91,19 @@ function gantt(inp) {
         extEach(['start', 'end'], function(border) {
             var boundary = room[border];
 
-            extInclude(boundsArr, boundary);
             boundsObj[boundary] = 0;
         })
     });
 
+    // create boundaries array ordered
+    var boundsArr = Object.keys(boundsObj);
+    for (var index = 0; index < boundsArr.length; index++) {
+        var strBoundary = boundsArr[index];
+        boundsArr.splice(index, 1, Number(strBoundary))
+    }
     boundsArr.sort();
+
+    console.log('All possible boundaries: %s' , JSON.stringify(boundsArr));
 
     // evaluate values on boundaries
     extEach(inp, function(room) {
@@ -82,7 +120,9 @@ function gantt(inp) {
         }
     });
 
-    // convert to continues single-dimension rooms
+    console.log('Boundaries values: %s' , JSON.stringify(boundsObj));
+
+    // convert to continues single-dimensioned rooms
     var startBoundaryIndex = boundsArr[0],
         startBoundary = boundsObj[startBoundaryIndex],
         startRoomValue = startBoundary,
@@ -93,14 +133,17 @@ function gantt(inp) {
             endRoomValue = boundsObj[endBoundaryIndex];
 
         if (endRoomValue !== startRoomValue) {
-            out.push({
-                start: startBoundaryIndex,
-                end: endBoundaryIndex,
-                value: startRoomValue
-            });
+            if (startRoomValue > 0) {
+                out.push({
+                    start: startBoundaryIndex,
+                    end: endBoundaryIndex,
+                    value: startRoomValue
+                });
 
-            startRoomValue = endRoomValue;
+            }
+
             startBoundaryIndex = endBoundaryIndex;
+            startRoomValue = endRoomValue;
         }
     }
 
@@ -181,6 +224,9 @@ function objectEquals(v1, v2) {
 function extEach(array, fn, scope, reverse) {
 //    array = ExtArray.from(array);
 
+    if (!array) {
+        return;
+    }
     var i,
         ln = array.length;
 
@@ -200,10 +246,4 @@ function extEach(array, fn, scope, reverse) {
     }
 
     return true;
-}
-
-function extInclude(array, item) {
-    if (array.indexOf(item) === -1) {
-        array.push(item);
-    }
 }
