@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bryntum Quiz ** Q 9</title>
+    <script type="text/javascript" src="http://cdn.sencha.com/ext-4.1.1-gpl/ext-all-debug.js"></script>
+
+    <script type="text/javascript" src="plugin.js"></script>
+</head>
+<body>
+
+<div id="quiz9"></div>
+</body>
+
+<script type="text/javascript">
+    Ext.onReady(function() {
+        var body = Ext.getBody();
+
+        var myGrid = new Ext.grid.Panel({
+            columns  : [
+                {
+                    text : 'foo'
+                }
+            ],
+            store    : new Ext.data.Store({
+                fields : ['foo'],
+                proxy : 'memory'
+            }),
+            plugins  : new MyGridPlugin()
+// case 1. load event happens immediatelly
+//            ,renderTo: body
+        });
+
+        myGrid.store.load([
+            { foo : 'bar' }
+        ]);
+// case 2. load event async and highlighting is fired via 'afterrender' handler
+        myGrid.render(body);
+    })
+</script>
+</html>

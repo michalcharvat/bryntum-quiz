@@ -328,8 +328,61 @@ myGrid.store.loadData([
     { foo : 'bar' }
 ]);
 
-// Answer & corrected plugin definition:
 
+
+// Answer & corrected plugin definition:
+//    Depends how the grid with plugin is rendered load event can happen before or after dom creation.
+//    If at the loading grid's el is still not inite (null), we need to create additional event handler (one-timer)
+//    to accomplish the job
+
+// try http://localhost/~user1/bquiz/question-9.html to demonstrate the solution
+// BTW there was one more issue, #loadData() does not fire 'load' event in current version of Ext, need to use #load()
+
+Ext.define('MyGridPlugin', {
+    extend : 'Ext.AbstractPlugin',
+
+    init : function(grid) {
+        grid.getStore().on({
+            load : function() {
+                // Some cool fx to bring attention to the grid
+                var el = grid.getEl();
+                if (el) {
+                    el.highlight();
+                    console.log('Case 1) Highlighting synced')
+                } else {
+                    grid.on('afterrender', function(ct) {
+                        ct.getEl().highlight();
+                        console.log('Case 2) Highlighting postponed via "afterrender" event')
+                    }, this, {single: true});
+                }
+            }
+        });
+    }
+});
+
+
+Ext.onReady(function() {
+    var body = Ext.getBody();
+
+    var myGrid = new Ext.grid.Panel({
+        columns  : [{
+                text : 'foo'
+            }],
+        store    : new Ext.data.Store({
+            fields : ['foo'],
+            proxy : 'memory'
+        }),
+        plugins  : new MyGridPlugin()
+// case 1. load event happens immediatelly
+//            ,renderTo: body
+    });
+
+    myGrid.store.load([
+        { foo : 'bar' }
+    ]);
+// case 2. load event async and highlighting is fired via 'afterrender' handler
+    myGrid.render(body);
+});
 
 
 /**
